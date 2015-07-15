@@ -2,7 +2,7 @@ package point
 
 import (
 	"math"
-	"osm/distance"
+	"github.com/vetinari/osm/distance"
 )
 
 

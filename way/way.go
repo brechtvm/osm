@@ -3,12 +3,12 @@ package way
 import (
 	"errors"
 	"fmt"
-	"osm/bbox"
-	"osm/item"
-	"osm/node"
-	"osm/point"
-	"osm/tags"
-	"osm/user"
+	"github.com/vetinari/osm/bbox"
+	"github.com/vetinari/osm/item"
+	"github.com/vetinari/osm/node"
+	"github.com/vetinari/osm/point"
+	"github.com/vetinari/osm/tags"
+	"github.com/vetinari/osm/user"
 	"time"
 )
 

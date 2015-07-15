@@ -2,7 +2,7 @@ package way
 
 import (
 	"math"
-	"osm/node"
+	"github.com/vetinari/osm/node"
 )
 
 func (w *Way) area() float64 {

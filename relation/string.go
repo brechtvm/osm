@@ -2,8 +2,8 @@ package relation
 
 import (
 	"fmt"
-	"osm/node"
-	"osm/way"
+	"github.com/vetinari/osm/node"
+	"github.com/vetinari/osm/way"
 	"time"
 )
 

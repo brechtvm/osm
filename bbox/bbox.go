@@ -2,7 +2,7 @@ package bbox
 
 import (
 	"fmt"
-	"osm/point"
+	"github.com/vetinari/osm/point"
 )
 
 type BBox struct {

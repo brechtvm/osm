@@ -2,12 +2,12 @@ package relation
 
 import (
 	// "fmt"
-	"osm/bbox"
-	"osm/item"
-	"osm/node"
-	"osm/tags"
-	"osm/user"
-	"osm/way"
+	"github.com/vetinari/osm/bbox"
+	"github.com/vetinari/osm/item"
+	"github.com/vetinari/osm/node"
+	"github.com/vetinari/osm/tags"
+	"github.com/vetinari/osm/user"
+	"github.com/vetinari/osm/way"
 	"time"
 )
 

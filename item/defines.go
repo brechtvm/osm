@@ -1,8 +1,8 @@
 package item
 
 import (
-	"osm/tags"
-	"osm/user"
+	"github.com/vetinari/osm/tags"
+	"github.com/vetinari/osm/user"
 	"time"
 )
 

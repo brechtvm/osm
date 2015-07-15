@@ -2,10 +2,10 @@ package osm
 
 import (
 	"fmt"
-	"osm/bbox"
-	"osm/node"
-	"osm/relation"
-	"osm/way"
+	"github.com/vetinari/osm/bbox"
+	"github.com/vetinari/osm/node"
+	"github.com/vetinari/osm/relation"
+	"github.com/vetinari/osm/way"
 	"sort"
 )
 
