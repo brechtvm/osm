@@ -1,0 +1,228 @@
+package way
+
+import (
+	"fmt"
+	"math"
+	"osm/distance"
+	"osm/node"
+	"osm/point"
+)
+
+func (w *Way) area() float64 {
+	i := len(w.Nodes_) - 2
+	var a float64
+	for n := 0; n < i; n++ {
+		// a += (deg2rad(w.Nodes[n].Position_.Lon)*deg2rad(w.Nodes[n+1].Position_.Lat) -
+		// 		deg2rad(w.Nodes[n].Position_.Lat)*deg2rad(w.Nodes[n+1].Position_.Lon))
+		a += (w.Nodes_[n].Position_.Lon*w.Nodes_[n+1].Position_.Lat -
+			w.Nodes_[n].Position_.Lat*w.Nodes_[n+1].Position_.Lon)
+	}
+	return a / 2
+}
+
+func (w *Way) Area_of() float64 {
+	n := len(w.Nodes_) - 2 // last node == first node
+	skip := 0
+	var sum float64 = 0.0
+	for j := 0; j < n; j++ {
+		i := j - 1
+		k := j + 1
+		var a, b, c float64
+		var center *point.Point
+		var cos float64
+		if j == 0 {
+			i = n
+		}
+		c = w.Nodes_[i].Position_.Angle(w.Nodes_[j].Position_)
+		a = w.Nodes_[j].Position_.Angle(w.Nodes_[k].Position_)
+		b = w.Nodes_[k].Position_.Angle(w.Nodes_[i].Position_) // opposite the angle at j
+		/*
+			cos a = cos b * cos c + sin b * sin c * cos A => cos A = (cos a - (cos b * cos c)) / (sin b * sin c)
+			cos b = cos c * cos a + sin c * sin a * cos B => cos B = (cos b - (cos c * cos a)) / (sin c * sin a)
+			cos c = cos a * cos b + sin a * sin b * cos C => cos C = (cos c - (cos a * cos b)) / (sin a * sin b)
+		*/
+		cos = (math.Cos(b) - math.Cos(c)*math.Cos(a)) / (math.Sin(c) * math.Sin(a))
+
+		if cos >= 1.0 || cos <= -1.0 {
+			// fmt.Printf("ERR @ Node #%d\n", w.Nodes[i].Id)
+			skip++
+			continue
+		}
+
+		acos := math.Acos(cos)
+		// no error, we have at least 2 nodes:
+		cw, _ := New([]*node.Node{w.Nodes_[i], w.Nodes_[j], w.Nodes_[k], w.Nodes_[i]})
+		center = cw.Centroid()
+		if !w.Contains(node.New(center)) {
+			// concave part: the center of the small triangle is outside
+			// the main area -> use the other side
+			acos = 2*math.Pi - acos
+		}
+		// fmt.Printf("ACOS=%f => %f\n", acos, acos * 180.0 / math.Pi)
+		sum += acos
+	}
+	// A_wanted := 891.68 * 1000000.0 / (float64(EarthRadius) * float64(EarthRadius) * math.Pi)
+
+	// A = (sum - (n - 2) * Pi)
+	A := sum - float64(n-skip-2)*math.Pi
+	fmt.Printf("SUM=%f (%d/%d) => %f/%f => %f\n", sum, skip, n, A, float64(n-skip-2)*math.Pi, A*float64(distance.EarthRadius)*float64(distance.EarthRadius))
+	return A * float64(distance.EarthRadius) * float64(distance.EarthRadius)
+}
+
+// Returns the area of the (closed) way. Note, that this area is in
+// square degrees
+func (w *Way) Area() float64 {
+	if !w.Closed() {
+		return -1.0
+	}
+	return math.Abs(w.area())
+}
+
+func Colat(rlat, rlon float64) float64 {
+	c := 2 * math.Atan2(
+		math.Sqrt(math.Sin(rlat/2)*math.Sin(rlat/2)+math.Sqrt(math.Cos(rlon/2)*math.Cos(rlon/2))),
+		math.Sqrt(1-math.Sin(rlat/2)*math.Sin(rlat/2)-math.Cos(rlat/2)*math.Sin(rlon/2)*math.Sin(rlon/2)))
+	return c
+}
+func (w *Way) Area_Of() float64 {
+	var sum float64
+	var prevcolat float64
+	var prevaz float64
+	var colat0 float64
+	var az0 float64
+	for i := 0; i < len(w.Nodes_)-2; i++ {
+		rlat := w.Nodes_[i].Position_.Lat * math.Pi / 180.0
+		rlon := w.Nodes_[i].Position_.Lon * math.Pi / 180.0
+		colat := Colat(rlat, rlon)
+		var az float64
+		if rlat >= math.Pi/2 {
+			az = 0.0
+		} else if rlat <= -math.Pi/2 {
+			az = math.Pi
+		} else {
+			// az = math.Atan2( math.Cos(rlat) * math.Sin(rlon), math.Sin(rlat) ) % 2 * math.Pi
+			az = math.Mod(math.Atan2(math.Cos(rlat)*math.Sin(rlon), math.Sin(rlat)), 2*math.Pi)
+		}
+
+		if i == 0 {
+			colat0 = colat
+			az0 = az
+		} else {
+			sum = sum + (1-math.Cos(prevcolat+(colat-prevcolat)/2))*math.Pi*math.Copysign(((math.Abs(az-prevaz)/math.Pi)-2*math.Ceil(((math.Abs(az-prevaz)/math.Pi)-1)/2)), (az-prevaz))
+			prevcolat = colat
+			prevaz = az
+		}
+	}
+	sum = sum + (1-math.Cos(prevcolat+(colat0-prevcolat)/2))*(az0-prevaz)
+	fmt.Printf("SUM Area_Of()=%f\n", sum)
+	tot := 4 * math.Pi //  * float64(distance.EarthRadius) * float64(distance.EarthRadius)
+	return tot * math.Min(math.Abs(sum)/4/math.Pi, 1-math.Abs(sum)/4/math.Pi)
+}
+
+func (w *Way) AreaOf() float64 {
+	//	if !w.Closed() {
+	//		return -1.0
+	//	}
+
+	pl := []*point.Point{}
+	for _, n := range w.Nodes_ {
+		pl = append(pl, point.New(n.Position_.Lat*math.Pi/180.0, n.Position_.Lon*math.Pi/180.0))
+	}
+	var lam1, lam2, beta1, beta2, cosB1, cosB2 float64
+	var hav float64
+	var sum float64
+	plen := len(pl) - 1
+
+	for i := 0; i < plen; i++ {
+		if i == 0 {
+			lam1 = pl[i].Lon
+			beta1 = pl[i].Lat
+			lam2 = pl[i+1].Lon
+			beta2 = pl[i+1].Lat
+			cosB1 = math.Cos(beta1)
+			cosB2 = math.Cos(beta2)
+		} else {
+			lam1 = lam2
+			beta1 = beta2
+			lam2 = pl[i+1].Lon
+			beta2 = pl[i+1].Lat
+			cosB1 = cosB2
+			cosB2 = math.Cos(beta2)
+		}
+
+		if lam1 != lam2 {
+			hav = Haversine(beta2-beta1) + cosB1*cosB2*Haversine(lam2-lam1)
+			a := 2 * math.Asin(math.Sqrt(hav))
+			b := math.Pi/2 - beta2
+			c := math.Pi/2 - beta1
+			s := (a + b + c) / 2
+			t := math.Tan((s-a)/2) * math.Tan((s-b)/2) * math.Tan((s-c)/2)
+			exc := math.Abs(4 * math.Atan(math.Sqrt(math.Abs(t))))
+			if lam2 < lam1 {
+				exc = -exc
+			}
+			sum += exc
+		}
+	}
+	return math.Abs(sum) // * float64(distance.EarthRadius) * float64(distance.EarthRadius)
+}
+
+func Haversine(x float64) float64 {
+	return (1.0 - math.Cos(x)) / 2.0
+}
+
+// http://alienryderflex.com/polygon/
+func (w *Way) Contains(n *node.Node) bool {
+	odd := false
+	j := len(w.Nodes_) - 2
+	for i := 0; i < len(w.Nodes_)-2; i++ {
+		if (w.Nodes_[i].Position_.Lon < n.Position_.Lon && w.Nodes_[j].Position_.Lon >= n.Position_.Lon) ||
+			(w.Nodes_[j].Position_.Lon < n.Position_.Lon && w.Nodes_[i].Position_.Lon >= n.Position_.Lon) {
+			if n.Position_.Lat >
+				w.Nodes_[i].Position_.Lat+
+					(n.Position_.Lon-w.Nodes_[i].Position_.Lon)/
+						(w.Nodes_[j].Position_.Lon-w.Nodes_[i].Position_.Lon)*(w.Nodes_[j].Position_.Lat-w.Nodes_[i].Position_.Lat) {
+				odd = !odd
+			}
+		}
+		j = i
+	}
+	return odd
+}
+
+/*
+func (w *Way) Contains(n *Node) bool {
+	if !w.Closed() {
+		return false
+	}
+	inside := false
+	p0 := w.Nodes_[0]
+	l := len(w.Nodes_) - 1
+	for i := 1; i < l; i++ {
+		pi := w.Nodes_[i]
+		if n.Position_.Lon == p0.Position_.Lon &&
+			p0.Position_.Lon == pi.Position_.Lon &&
+			(n.Position_.Lat >= n.Position_.Lat || n.Position_.Lat >= pi.Position_.Lat) &&
+			(n.Position_.Lat <= n.Position_.Lat || n.Position_.Lat <= pi.Position_.Lat) {
+
+			return true
+		}
+		if p0.Position_.Lat == pi.Position_.Lat ||
+			(n.Position_.Lat <= p0.Position_.Lat && n.Position_.Lat <= pi.Position_.Lat) ||
+			(n.Position_.Lat > p0.Position_.Lat && n.Position_.Lat > pi.Position_.Lat) ||
+			(n.Position_.Lon > p0.Position_.Lon && n.Position_.Lon > pi.Position_.Lon) {
+			p0 = pi
+			continue
+		}
+		if p0.Position_.Lon == pi.Position_.Lon ||
+			n.Position_.Lon <= ((n.Position_.Lat-p0.Position_.Lat)*(pi.Position_.Lon-p0.Position_.Lon)/
+				(pi.Position_.Lat-p0.Position_.Lat)+p0.Position_.Lon) {
+			inside = !inside
+		}
+		p0 = pi
+	}
+	return inside
+}
+*/
+
+// vim: ts=4 sw=4 noexpandtab nolist syn=go

@@ -1,0 +1,94 @@
+package relation
+
+import (
+	"errors"
+	"fmt"
+	"osm/way"
+)
+
+// Prerequisites
+// 1) outer ways must be first
+// 2) no overlapping areas (not even touching)
+// 3) all sub parts of a way must be in order they're added, i.e. for a
+//    rectangle
+//                     b
+//                   _____
+//                  |     |
+//                 a|     | c
+//                   -----
+//                     d
+//    the order for the four ways a, b, c and d must be "a b c d" and not
+//    like "a c d b"
+//
+// This covers inner areas not to be part of the area size (enclaves).
+//
+// Any way not inside the first way will be added to the size (exclave)
+//
+// Something like (O(I(O)I)O) where the area is the "O" does also work:
+// the innermost "O" area will be added to the outermost "O" area, because
+// it is inside 2 areas
+// Note, that this area is in square degrees
+func (r *Relation) Area() (area float64, err error) {
+	var seen []*way.Way
+	var wayList []*way.Way
+	wayList, err = r.WayMembersAsWays()
+	if err != nil {
+		return
+	}
+	fmt.Printf("WL=%d\n", len(wayList))
+	for i, w := range wayList {
+		if !w.Closed() {
+			area = -1.0
+			err = errors.New(fmt.Sprintf("Way #%d is not closed", i))
+			return
+		}
+		count := 0
+		for _, s := range seen {
+			if s.Contains(w.Nodes_[0]) {
+				count += 1
+			}
+		}
+		seen = append(seen, w)
+		var add float64 = 1.0
+		if count%2 == 1 {
+			add = -1.0
+		}
+		area += add * w.Area()
+	}
+	return
+}
+
+func (r *Relation) AreaOf() (area float64, err error) {
+	var seen []*way.Way
+	var wayList []*way.Way
+	wayList, err = r.WayMembersAsWays()
+	if err != nil {
+		area = -1.0
+		return
+	}
+	for i, w := range wayList {
+		if !w.Closed() {
+			area = -1.0
+			err = errors.New(fmt.Sprintf("Way #%d is not closed", i))
+			return
+		}
+		count := 0
+		for _, s := range seen {
+			if s.Contains(w.Nodes_[0]) {
+				count += 1
+			}
+		}
+		seen = append(seen, w)
+		var add float64 = 1.0
+		if count%2 == 1 {
+			add = -1.0
+		}
+		fmt.Printf("AreaOf=%f\nArea_of=%f\nArea_Of=%f\n", w.AreaOf(), w.Area_of(), w.Area_Of())
+		// area += add * w.AreaOf()
+		// area += add * w.Area_of()
+		area += add * w.Area_of()
+	}
+	return area, nil
+}
+
+// vim: ts=4 sw=4 noexpandtab nolist syn=go

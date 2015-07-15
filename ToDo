@@ -1,0 +1,12 @@
+* API for adding / deleting / move /modify stuff
+* fetch missing nodes / ways / relations from OSM?
+* more docs
+* tests ;-)
+* more / better filter like
+  - cut bbox
+  - key in tags present
+  - ...
+* merge 2 *OSM
+* output:
+  - OSMChange (http://wiki.openstreetmap.org/wiki/OsmChange)
+  - JOSM (http://wiki.openstreetmap.org/wiki/JOSM_file_format)
