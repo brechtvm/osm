@@ -32,14 +32,14 @@ Yet another pbf to osm xml converter:
 
         fh, err := os.Open(os.Args[1])
         if err != nil {
-            fmt.Fprintf(os.Stderr, "%s: failed to open %s: %s\n", os.Args[1], err)
+            fmt.Fprintf(os.Stderr, "%s: failed to open %s: %s\n", os.Args[0], os.Args[1], err)
             os.Exit(1)
         }
         defer fh.Close()
 
         o, err := osm.New(pbf.Parser(fh))
         if err != nil {
-            fmt.Fprintf(os.Stderr, "%s: failed to parse %s: %s\n", os.Args[1], err)
+            fmt.Fprintf(os.Stderr, "%s: failed to parse %s: %s\n", os.Args[0], os.Args[1], err)
             os.Exit(1)
         }
 
