@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/vetinari/osm"
+	"github.com/vetinari/osm/bbox"
 	"github.com/vetinari/osm/xml"
 	"io/ioutil"
 	"net/http"
@@ -64,7 +65,7 @@ func (o *OverpassAPI) Query(query string) (err error) {
 			o.Type = osm.FmtUnknown
 		}
 	case http.StatusBadRequest:
-		err = errors.New("Syntax error in request: %s", parseError(o.Data))
+		err = errors.New(fmt.Sprintf("Syntax error in request: %s", parseError(o.Data)))
 	case 429: // FIXME when net/http exports StatusTooManyRequests
 		err = errors.New("Too many requests")
 	case http.StatusGatewayTimeout:
