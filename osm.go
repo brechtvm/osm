@@ -82,9 +82,19 @@ func (o *OSM) GetRelationList() *relation.RelationList {
 	return &rlist
 }
 
+type DataFormat int
+
+const (
+	FmtUnknown DataFormat = iota
+	FmtXML
+	FmtPBF
+	FmtGeoJSON
+	FmtOverpassJSON
+)
+
 var osmStringVersion = "0.1"
 
-// returns a stringified (in osm XML format) version of the OSM. Do not 
+// returns a stringified (in osm XML format) version of the OSM. Do not
 // use for huge OSM data, better dump to some file via xml.Dump()
 func (o *OSM) String() string {
 	xml := "<?xml version='1.0' encoding='UTF-8'?>\n" +
