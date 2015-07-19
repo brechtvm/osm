@@ -13,22 +13,29 @@ import (
 )
 
 // part of the item.Item interface
-func (self *Way) Type() item.ItemType  { return item.TypeWay }
+func (self *Way) Type() item.ItemType { return item.TypeWay }
+
 // part of the item.Item interface
-func (self *Way) Id() int64            { return self.Id_ }
-func (self *Way) Nodes() []*node.Node  { return self.Nodes_ }
+func (self *Way) Id() int64           { return self.Id_ }
+func (self *Way) Nodes() []*node.Node { return self.Nodes_ }
+
 // part of the item.Item interface
-func (self *Way) User() *user.User     { return self.User_ }
+func (self *Way) User() *user.User { return self.User_ }
+
 // part of the item.Item interface
-func (self *Way) Tags() *tags.Tags     { return self.Tags_ }
+func (self *Way) Tags() *tags.Tags { return self.Tags_ }
+
 // part of the item.Item interface
 func (self *Way) Timestamp() time.Time { return self.Timestamp_ }
+
 // part of the item.Item interface
-func (self *Way) Version() int64       { return self.Version_ }
+func (self *Way) Version() int64 { return self.Version_ }
+
 // part of the item.Item interface
-func (self *Way) Changeset() int64     { return self.Changeset_ }
+func (self *Way) Changeset() int64 { return self.Changeset_ }
+
 // part of the item.Item interface
-func (self *Way) Visible() bool        { return self.Visible_ }
+func (self *Way) Visible() bool { return self.Visible_ }
 
 type Way struct {
 	Id_        int64
