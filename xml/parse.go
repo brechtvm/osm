@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io"
-	"os"
 	"github.com/vetinari/osm"
 	"github.com/vetinari/osm/item"
 	"github.com/vetinari/osm/node"
@@ -14,6 +12,9 @@ import (
 	"github.com/vetinari/osm/tags"
 	"github.com/vetinari/osm/user"
 	"github.com/vetinari/osm/way"
+	"io"
+	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -234,7 +235,7 @@ func (x *DotOSM) parseRelation(id int64) (members []*relation.Member, t *tags.Ta
 		case "<member":
 			ref := str2int64(m["ref"])
 
-			member := &relation.Member{Type_: item.ItemTypeFromString(m["type"]), Role: m["role"]}
+			member := &relation.Member{Type_: item.ItemTypeFromString(m["type"]), Role: m["role"], Id_: ref}
 			switch member.Type() {
 			case item.TypeNode:
 				member.Ref = x.data.GetNode(ref)
@@ -244,7 +245,7 @@ func (x *DotOSM) parseRelation(id int64) (members []*relation.Member, t *tags.Ta
 				member.Ref = x.data.GetRelation(ref)
 			}
 			if member.Ref == nil {
-				fmt.Printf("WARNING: Missing %s id %d in relation %d\n", member.Type(), ref, id)
+				log.Printf("WARNING: Missing %s id #%d in relation #%d\n", member.Type(), ref, id)
 			}
 			members = append(members, member)
 

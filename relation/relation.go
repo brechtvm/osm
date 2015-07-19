@@ -32,6 +32,7 @@ type Member struct {
 	Type_ item.ItemType
 	Role  string
 	Ref   item.Item
+	Id_   int64
 }
 
 type Relation struct {
@@ -68,10 +69,18 @@ func (m *Member) Type() item.ItemType {
 	return m.Type_
 }
 
+func (m *Member) Id() int64 {
+	return m.Id_
+}
+
 func NewMember(role string, i item.Item) *Member {
 	switch i.Type() {
-	case item.TypeNode, item.TypeWay, item.TypeRelation:
-		return &Member{Type_: i.Type(), Role: role, Ref: i}
+	case item.TypeNode:
+		return &Member{Type_: i.Type(), Role: role, Ref: i, Id_: i.(*node.Node).Id()}
+	case item.TypeWay:
+		return &Member{Type_: i.Type(), Role: role, Ref: i, Id_: i.(*way.Way).Id()}
+	case item.TypeRelation:
+		return &Member{Type_: i.Type(), Role: role, Ref: i, Id_: i.(*Relation).Id()}
 	default:
 		panic("invalid member type")
 	}

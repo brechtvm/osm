@@ -5,9 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/qedus/osmpbf"
-	"io"
-	"log"
-	"os"
 	"github.com/vetinari/osm"
 	"github.com/vetinari/osm/item"
 	"github.com/vetinari/osm/node"
@@ -16,10 +13,13 @@ import (
 	"github.com/vetinari/osm/tags"
 	"github.com/vetinari/osm/user"
 	"github.com/vetinari/osm/way"
+	"io"
+	"log"
+	"os"
 	"runtime"
 )
 
-// returns an osm.Parser which can be used as argument to osm.New(), reads 
+// returns an osm.Parser which can be used as argument to osm.New(), reads
 // from the given file
 func FileParser(file string) (osm.Parser, io.Closer, error) {
 	fh, err := os.Open(file)
@@ -29,7 +29,7 @@ func FileParser(file string) (osm.Parser, io.Closer, error) {
 	return Parser(fh), fh, nil
 }
 
-// returns an osm.Parser which can be used as argument to osm.New(), reads 
+// returns an osm.Parser which can be used as argument to osm.New(), reads
 // from byte array
 func ByteParser(data []byte) osm.Parser {
 	return Parser(bytes.NewReader(data))
@@ -120,7 +120,7 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 				}
 				var members []*relation.Member
 				for _, m := range v.Members {
-					member := &relation.Member{Role: m.Role}
+					member := &relation.Member{Role: m.Role, Id_: m.ID}
 					switch m.Type {
 					case osmpbf.NodeType:
 						member.Type_ = item.TypeNode
