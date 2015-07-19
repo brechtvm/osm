@@ -15,7 +15,7 @@ var xmlWriterVersion = "1.0"
 // Dump() is not suitable for uploading: modified items still have the same version
 func Dump(w io.Writer, o *osm.OSM) {
 	w.Write([]byte("<?xml version='1.0' encoding='UTF-8'?>\n"))
-	w.Write([]byte(fmt.Sprintf("<osm version='0.6' generator='osm/xml/write.go v%s'>\n", xmlWriterVersion)))
+	w.Write([]byte(fmt.Sprintf(`<osm version="0.6" generator="osm/xml/write.go v%s">`+"\n", xmlWriterVersion)))
 
 	bb, err := o.BoundingBox()
 	if err == nil {
