@@ -2,12 +2,12 @@ package node
 
 import (
 	"errors"
-	"math"
 	"github.com/vetinari/osm/bbox"
 	"github.com/vetinari/osm/item"
 	"github.com/vetinari/osm/point"
 	"github.com/vetinari/osm/tags"
 	"github.com/vetinari/osm/user"
+	"math"
 	"time"
 )
 
@@ -28,22 +28,29 @@ type Node struct {
 type NodeList []*Node
 
 // part of the item.Item interface
-func (self *Node) Changeset() int64       { return self.Changeset_ }
+func (self *Node) Changeset() int64 { return self.Changeset_ }
+
 // part of the item.Item interface
 func (self *Node) Id() int64              { return self.Id_ }
 func (self *Node) Position() *point.Point { return self.Position_ }
+
 // part of the item.Item interface
-func (self *Node) Tags() *tags.Tags       { return self.Tags_ }
+func (self *Node) Tags() *tags.Tags { return self.Tags_ }
+
 // part of the item.Item interface
-func (self *Node) Timestamp() time.Time   { return self.Timestamp_ }
+func (self *Node) Timestamp() time.Time { return self.Timestamp_ }
+
 // part of the item.Item interface
-func (self *Node) Type() item.ItemType    { return item.TypeNode }
+func (self *Node) Type() item.ItemType { return item.TypeNode }
+
 // part of the item.Item interface
-func (self *Node) User() *user.User       { return self.User_ }
+func (self *Node) User() *user.User { return self.User_ }
+
 // part of the item.Item interface
-func (self *Node) Version() int64         { return self.Version_ }
+func (self *Node) Version() int64 { return self.Version_ }
+
 // part of the item.Item interface
-func (self *Node) Visible() bool          { return self.Visible_ }
+func (self *Node) Visible() bool { return self.Visible_ }
 
 var newNodeNum int64 = 0
 

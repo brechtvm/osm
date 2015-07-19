@@ -7,7 +7,7 @@ import (
 	"github.com/vetinari/osm/way"
 )
 
-func (o *OSM) FilterTags(tl... *tags.Tags) *OSM {
+func (o *OSM) FilterTags(tl ...*tags.Tags) *OSM {
 	no := NewOSM()
 	for id := range o.Nodes {
 		n := o.GetNode(id)

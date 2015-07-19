@@ -2,15 +2,16 @@ package xml
 
 import (
 	"fmt"
-	"io"
 	"github.com/vetinari/osm"
 	"github.com/vetinari/osm/node"
 	"github.com/vetinari/osm/relation"
 	"github.com/vetinari/osm/way"
+	"io"
 	"sort"
 )
 
 var xmlWriterVersion = "1.0"
+
 // Dump() is not suitable for uploading: modified items still have the same version
 func Dump(w io.Writer, o *osm.OSM) {
 	w.Write([]byte("<?xml version='1.0' encoding='UTF-8'?>\n"))

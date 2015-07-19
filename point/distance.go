@@ -1,10 +1,9 @@
 package point
 
 import (
-	"math"
 	"github.com/vetinari/osm/distance"
+	"math"
 )
-
 
 // the Great Circle Distance
 func (p *Point) DistanceOf(q *Point) distance.Distance {

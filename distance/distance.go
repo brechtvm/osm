@@ -1,4 +1,5 @@
 package distance
+
 // this should be in a seperate "units" package
 import (
 	"fmt"

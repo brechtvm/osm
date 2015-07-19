@@ -1,8 +1,8 @@
 package way
 
 import (
-	"math"
 	"github.com/vetinari/osm/node"
+	"math"
 )
 
 func (w *Way) area() float64 {
@@ -37,7 +37,7 @@ func (w *Way) Contains(n *node.Node) bool {
 				w.Nodes_[i].Position_.Lat+
 					(n.Position_.Lon-w.Nodes_[i].Position_.Lon)/
 						(w.Nodes_[j].Position_.Lon-w.Nodes_[i].Position_.Lon)*
-							(w.Nodes_[j].Position_.Lat-w.Nodes_[i].Position_.Lat) {
+						(w.Nodes_[j].Position_.Lat-w.Nodes_[i].Position_.Lat) {
 				odd = !odd
 			}
 		}

@@ -53,7 +53,7 @@ func (p *CPoint) Spherical() *Point {
 
 // The angle between two points (in the center of the sphere)
 func (p *Point) Angle(q *Point) float64 {
-// http://www.intmath.com/vectors/7-vectors-in-3d-space.php
+	// http://www.intmath.com/vectors/7-vectors-in-3d-space.php
 	cp := p.Cartesian()
 	cq := q.Cartesian()
 
