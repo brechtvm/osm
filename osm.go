@@ -98,7 +98,7 @@ var osmStringVersion = "0.1"
 // use for huge OSM data, better dump to some file via xml.Dump()
 func (o *OSM) String() string {
 	xml := "<?xml version='1.0' encoding='UTF-8'?>\n" +
-		fmt.Sprintf("<osm version='0.6' upload='true' generator='osm.String v%s'>\n", osmStringVersion)
+		fmt.Sprintf(`<osm version="0.6" upload="true" generator="osm.String v%s">`+"\n", osmStringVersion)
 	bb, err := o.BoundingBox()
 	if err == nil {
 		xml += bb.String()

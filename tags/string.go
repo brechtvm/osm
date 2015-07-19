@@ -10,7 +10,7 @@ func (t *Tags) String() string {
 		return s
 	}
 	for k, v := range map[string]string(*t) {
-		s += fmt.Sprintf("    <tag k='%s' v='%s' />\n", k, encodeXML(v))
+		s += fmt.Sprintf(`    <tag k="%s" v="%s" />`+"\n", k, encodeXML(v))
 	}
 	return s
 }

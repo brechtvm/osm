@@ -9,8 +9,7 @@ import (
 )
 
 func (r *Relation) String() string {
-	s := fmt.Sprintf("  <relation id='%d' timestamp='%s' uid='%d' user='%s' visible='%t'"+
-		" version='%d' changeset='%d'>\n",
+	s := fmt.Sprintf(`  <relation id="%d" timestamp="%s" uid="%d" user="%s" visible="%t" version="%d" changeset="%d">`+"\n",
 		r.Id_, r.Timestamp_.Format(time.RFC3339), r.User_.Id, r.User_.Name, r.Visible_, r.Version_, r.Changeset_)
 	for _, m := range r.GetMembers() {
 		var id int64
@@ -42,7 +41,7 @@ func (r *Relation) String() string {
 				}
 			}
 		}
-		s += fmt.Sprintf("    <member type='%s' ref='%d' role='%s' />\n", m.Type(), id, m.Role)
+		s += fmt.Sprintf(`    <member type="%s" ref="%d" role="%s" />`+"\n", m.Type(), id, m.Role)
 	}
 	return s + r.Tags_.String() + "  </relation>\n"
 }
