@@ -1,7 +1,6 @@
 package relation
 
 import (
-	// "fmt"
 	"github.com/vetinari/osm/bbox"
 	"github.com/vetinari/osm/item"
 	"github.com/vetinari/osm/node"
@@ -112,6 +111,10 @@ func (r *Relation) GetNodes() []*node.Node {
 
 func (r *Relation) GetWays() []*way.Way {
 	var w []*way.Way
+
+	if r == nil || len(r.GetMembers()) == 0 {
+		return w
+	}
 
 	for _, m := range r.GetMembers() {
 		switch (m.Ref).(type) {
