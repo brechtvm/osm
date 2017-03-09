@@ -1,6 +1,7 @@
 package osm
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/brechtvm/osm/bbox"
 	"github.com/brechtvm/osm/node"
@@ -96,7 +97,7 @@ var osmStringVersion = "0.1"
 
 // returns a stringified (in osm XML format) version of the OSM. Do not
 // use for huge OSM data, better dump to some file via xml.Dump()
-func (o *OSM) String() string {
+func (o *OSM) String_old() string {
 	xml := "<?xml version='1.0' encoding='UTF-8'?>\n" +
 		fmt.Sprintf(`<osm version="0.6" upload="true" generator="osm.String v%s">`+"\n", osmStringVersion)
 	bb, err := o.BoundingBox()
@@ -126,6 +127,50 @@ func (o *OSM) String() string {
 
 	xml += "</osm>\n"
 	return xml
+}
+
+func (o *OSM) String() string {
+	var xmlBuffer bytes.Buffer
+	xml := "<?xml version='1.0' encoding='UTF-8'?>\n" +
+		fmt.Sprintf(`<osm version="0.6" upload="true" generator="Be-Mobile (Brecht) - osm.String v%s">`+"\n", osmStringVersion)
+	xmlBuffer.WriteString(xml)
+
+	bb, err := o.BoundingBox()
+	if err == nil {
+		//xml += bb.String()
+		xmlBuffer.WriteString(bb.String())
+	}
+
+	nl := o.GetNodeList()
+	fmt.Printf("%d nodes \n", nl.Len())
+	sort.Sort(nl)
+	for _, n := range []*node.Node(*nl) {
+		//xml += n.String()
+		xmlBuffer.WriteString(n.String())
+	}
+
+	wl := o.GetWayList()
+	fmt.Printf("%d ways \n", wl.Len())
+	sort.Sort(wl)
+	for _, w := range []*way.Way(*wl) {
+		//xml += w.String()
+		xmlBuffer.WriteString(w.String())
+	}
+
+	rl := o.GetRelationList()
+	fmt.Printf("%d relations \n", rl.Len())
+	if len([]*relation.Relation(*rl)) != 0 {
+		sort.Sort(rl)
+	}
+	for _, r := range []*relation.Relation(*rl) {
+		//xml += r.String()
+		xmlBuffer.WriteString(r.String())
+	}
+
+	//xml += "</osm>\n"
+	xmlBuffer.WriteString("</osm>\n")
+	//return xml
+	return xmlBuffer.String()
 }
 
 // vim: ts=4 sw=4 noexpandtab nolist syn=go
