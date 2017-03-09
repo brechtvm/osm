@@ -1,12 +1,12 @@
 package relation
 
 import (
-	"github.com/vetinari/osm/bbox"
-	"github.com/vetinari/osm/item"
-	"github.com/vetinari/osm/node"
-	"github.com/vetinari/osm/tags"
-	"github.com/vetinari/osm/user"
-	"github.com/vetinari/osm/way"
+	"github.com/brechtvm/osm/bbox"
+	"github.com/brechtvm/osm/item"
+	"github.com/brechtvm/osm/node"
+	"github.com/brechtvm/osm/tags"
+	"github.com/brechtvm/osm/user"
+	"github.com/brechtvm/osm/way"
 	"time"
 )
 

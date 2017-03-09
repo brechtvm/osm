@@ -2,10 +2,10 @@ package xml
 
 import (
 	"fmt"
-	"github.com/vetinari/osm"
-	"github.com/vetinari/osm/node"
-	"github.com/vetinari/osm/relation"
-	"github.com/vetinari/osm/way"
+	"github.com/brechtvm/osm"
+	"github.com/brechtvm/osm/node"
+	"github.com/brechtvm/osm/relation"
+	"github.com/brechtvm/osm/way"
 	"io"
 	"sort"
 )

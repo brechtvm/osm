@@ -3,9 +3,9 @@ package relation
 import (
 	"errors"
 	"fmt"
-	"github.com/vetinari/osm/bbox"
-	"github.com/vetinari/osm/point"
-	"github.com/vetinari/osm/way"
+	"github.com/brechtvm/osm/bbox"
+	"github.com/brechtvm/osm/point"
+	"github.com/brechtvm/osm/way"
 )
 
 // Weighted centroid of all area parts

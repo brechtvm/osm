@@ -1,7 +1,7 @@
 package way
 
 import (
-	"github.com/vetinari/osm/point"
+	"github.com/brechtvm/osm/point"
 )
 
 func (w *Way) Centroid() *point.Point {

@@ -3,9 +3,9 @@ package osmorg
 import (
 	"errors"
 	"fmt"
-	"github.com/vetinari/osm"
-	"github.com/vetinari/osm/bbox"
-	"github.com/vetinari/osm/xml"
+	"github.com/brechtvm/osm"
+	"github.com/brechtvm/osm/bbox"
+	"github.com/brechtvm/osm/xml"
 	"io/ioutil"
 	"net/http"
 	"os"

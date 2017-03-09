@@ -2,11 +2,11 @@ package node
 
 import (
 	"errors"
-	"github.com/vetinari/osm/bbox"
-	"github.com/vetinari/osm/item"
-	"github.com/vetinari/osm/point"
-	"github.com/vetinari/osm/tags"
-	"github.com/vetinari/osm/user"
+	"github.com/brechtvm/osm/bbox"
+	"github.com/brechtvm/osm/item"
+	"github.com/brechtvm/osm/point"
+	"github.com/brechtvm/osm/tags"
+	"github.com/brechtvm/osm/user"
 	"math"
 	"time"
 )

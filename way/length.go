@@ -1,7 +1,7 @@
 package way
 
 import (
-	"github.com/vetinari/osm/distance"
+	"github.com/brechtvm/osm/distance"
 )
 
 // sum of all node distances along the way

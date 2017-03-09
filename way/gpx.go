@@ -2,7 +2,7 @@ package way
 
 import (
 	"fmt"
-	"github.com/vetinari/osm/point"
+	"github.com/brechtvm/osm/point"
 )
 
 func (w *Way) GPX(center *point.Point) string {

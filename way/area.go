@@ -1,7 +1,7 @@
 package way
 
 import (
-	"github.com/vetinari/osm/node"
+	"github.com/brechtvm/osm/node"
 	"math"
 )
 
