@@ -49,6 +49,11 @@ func (t *Tags) Get(key string) string {
 	return m[key]
 }
 
+func (t *Tags) Length() int {
+	m := map[string]string(*t)
+	return len(m)
+}
+
 // see func (tags *Tags) Reverse()
 var OppositeValues = map[string]map[string]string{
 	// tag k=...
