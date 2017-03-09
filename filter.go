@@ -1,10 +1,10 @@
 package osm
 
 import (
-	"github.com/vetinari/osm/node"
-	"github.com/vetinari/osm/relation"
-	"github.com/vetinari/osm/tags"
-	"github.com/vetinari/osm/way"
+	"github.com/brechtvm/osm/node"
+	"github.com/brechtvm/osm/relation"
+	"github.com/brechtvm/osm/tags"
+	"github.com/brechtvm/osm/way"
 )
 
 func (o *OSM) FilterTags(tl ...*tags.Tags) *OSM {
