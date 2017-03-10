@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"github.com/brechtvm/osm/node"
 	"github.com/brechtvm/osm/way"
+	"golang.org/x/net/html"
 	"log"
 	"time"
 )
 
 func (r *Relation) String() string {
 	s := fmt.Sprintf(`  <relation id="%d" timestamp="%s" uid="%d" user="%s" visible="%t" version="%d" changeset="%d">`+"\n",
-		r.Id_, r.Timestamp_.Format(time.RFC3339), r.User_.Id, r.User_.Name, r.Visible_, r.Version_, r.Changeset_)
+		r.Id_, r.Timestamp_.Format(time.RFC3339), r.User_.Id, html.EscapeString(r.User_.Name), r.Visible_, r.Version_, r.Changeset_)
 	for _, m := range r.GetMembers() {
 		var id int64
 		if m.Ref == nil {
