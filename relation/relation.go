@@ -16,8 +16,8 @@ func (self *Relation) Members() []*Member   { return self.Members_ }
 func (self *Relation) User() *user.User     { return self.User_ }
 func (self *Relation) Tags() *tags.Tags     { return self.Tags_ }
 func (self *Relation) Timestamp() time.Time { return self.Timestamp_ }
-func (self *Relation) Version() int64       { return self.Version_ }
-func (self *Relation) Changeset() int64     { return self.Changeset_ }
+func (self *Relation) Version() uint16      { return self.Version_ }
+func (self *Relation) Changeset() uint64    { return self.Changeset_ }
 func (self *Relation) Visible() bool        { return self.Visible_ }
 
 var newRelationNum int64 = 0
@@ -40,8 +40,8 @@ type Relation struct {
 	User_      *user.User
 	Tags_      *tags.Tags
 	Timestamp_ time.Time
-	Version_   int64
-	Changeset_ int64
+	Version_   uint16
+	Changeset_ uint64
 	Visible_   bool
 	modified   bool
 	deleted    bool

@@ -17,8 +17,8 @@ type Node struct {
 	User_      *user.User
 	Tags_      *tags.Tags
 	Timestamp_ time.Time
-	Version_   int64
-	Changeset_ int64
+	Version_   uint16
+	Changeset_ uint64
 	Visible_   bool
 	modified   bool
 	deleted    bool
@@ -28,7 +28,7 @@ type Node struct {
 type NodeList []*Node
 
 // part of the item.Item interface
-func (self *Node) Changeset() int64 { return self.Changeset_ }
+func (self *Node) Changeset() uint64 { return self.Changeset_ }
 
 // part of the item.Item interface
 func (self *Node) Id() int64              { return self.Id_ }
@@ -47,7 +47,7 @@ func (self *Node) Type() item.ItemType { return item.TypeNode }
 func (self *Node) User() *user.User { return self.User_ }
 
 // part of the item.Item interface
-func (self *Node) Version() int64 { return self.Version_ }
+func (self *Node) Version() uint16 { return self.Version_ }
 
 // part of the item.Item interface
 func (self *Node) Visible() bool { return self.Visible_ }

@@ -3,11 +3,11 @@ package user
 import ()
 
 type User struct {
-	Id   int64
+	Id   uint32
 	Name string
 }
 
-func New(id int64, name string) *User {
+func New(id uint32, name string) *User {
 	return &User{Id: id, Name: name}
 }
 

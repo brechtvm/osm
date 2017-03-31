@@ -49,8 +49,8 @@ type Item interface {
 	User() *user.User
 	Tags() *tags.Tags
 	Timestamp() time.Time
-	Version() int64
-	Changeset() int64
+	Version() uint16
+	Changeset() uint64
 	Visible() bool
 }
 

@@ -6,8 +6,10 @@ import (
 	"github.com/brechtvm/osm/bbox"
 	"github.com/brechtvm/osm/node"
 	"github.com/brechtvm/osm/relation"
+	"github.com/brechtvm/osm/user"
 	"github.com/brechtvm/osm/way"
 	"sort"
+	"time"
 )
 
 // the osm.Parser interface, currently implemented by the xml and pbf sub modules
@@ -32,12 +34,14 @@ func NewOSM() *OSM {
 
 // the main entry point for OSM data
 type OSM struct {
-	Version   string
-	BBox      bbox.BBox
-	Origin    string
-	Nodes     map[int64]*node.Node
-	Ways      map[int64]*way.Way
-	Relations map[int64]*relation.Relation
+	Version    string
+	BBox       bbox.BBox
+	Origin     string
+	Nodes      map[int64]*node.Node
+	Ways       map[int64]*way.Way
+	Relations  map[int64]*relation.Relation
+	Users      map[uint32]*user.User
+	Timestamps map[string]time.Time
 }
 
 func (o *OSM) BoundingBox() (*bbox.BBox, error) {

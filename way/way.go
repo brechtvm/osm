@@ -29,10 +29,10 @@ func (self *Way) Tags() *tags.Tags { return self.Tags_ }
 func (self *Way) Timestamp() time.Time { return self.Timestamp_ }
 
 // part of the item.Item interface
-func (self *Way) Version() int64 { return self.Version_ }
+func (self *Way) Version() uint16 { return self.Version_ }
 
 // part of the item.Item interface
-func (self *Way) Changeset() int64 { return self.Changeset_ }
+func (self *Way) Changeset() uint64 { return self.Changeset_ }
 
 // part of the item.Item interface
 func (self *Way) Visible() bool { return self.Visible_ }
@@ -43,8 +43,8 @@ type Way struct {
 	User_      *user.User
 	Tags_      *tags.Tags
 	Timestamp_ time.Time
-	Version_   int64
-	Changeset_ int64
+	Version_   uint16
+	Changeset_ uint64
 	Visible_   bool
 	modified   bool
 	deleted    bool
@@ -86,7 +86,7 @@ func (w *Way) SetTags(t *tags.Tags) {
 }
 
 // move all points of w, use the node with id as reference to do a relative move
-func (w *Way) MoveTo(id int64, p *point.Point) error {
+func (w *Way) MoveTo(id uint64, p *point.Point) error {
 	ref := w.Nodes_[id]
 	if ref == nil {
 		return errors.New(fmt.Sprintf("Node #%d not part of Way #%d\n", id, w.Id()))
