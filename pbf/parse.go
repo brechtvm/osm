@@ -75,7 +75,8 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 					log.Printf("Processed %d nodes ", counter)
 					log.Printf("[%d]users", len(o.Users))
 				}
-				if counter%50000000 == 0 {
+				// Free up memory every 250mio records
+				if counter%250000000 == 0 {
 					debug.FreeOSMemory()
 					log.Printf("Garbage collected!")
 				}
