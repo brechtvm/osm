@@ -52,7 +52,8 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 
 	d := osmpbf.NewDecoder(p.r)
 
-	err = d.Start(runtime.GOMAXPROCS(-1))
+	//err = d.Start(runtime.GOMAXPROCS(-1))
+	err = d.Start(runtime.GOMAXPROCS(4))
 	if err != nil {
 		return
 	}
