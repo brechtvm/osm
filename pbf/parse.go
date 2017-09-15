@@ -82,17 +82,20 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 					log.Printf("Garbage collected!")
 				}
 				var t tags.Tags
+				// if v.Tags != nil && len(v.Tags) != 0 {
+				// 	subsetTags := make(map[string]string)
+				// 	for tagN, tagV := range v.Tags {
+				// 		for _, tag := range tagsToKeep {
+				// 			if tagN == tag {
+				// 				subsetTags[tagN] = tagV
+				// 			}
+				// 		}
+				// 	}
+				// 	t = tags.Tags(subsetTags)
+				// 	subsetTags = nil
+				// }
 				if v.Tags != nil && len(v.Tags) != 0 {
-					subsetTags := make(map[string]string)
-					for tagN, tagV := range v.Tags {
-						for _, tag := range tagsToKeep {
-							if tagN == tag {
-								subsetTags[tagN] = tagV
-							}
-						}
-					}
-					t = tags.Tags(subsetTags)
-					subsetTags = nil
+					t = v.Tags
 				}
 
 				// UserInfo
@@ -123,25 +126,26 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 				}
 				var t tags.Tags
 				if v.Tags != nil && len(v.Tags) != 0 {
-					subsetTags := make(map[string]string)
-					keep := false
-					for tagN, _ := range v.Tags {
-						if tagN == "highway" {
-							keep = true
-						}
-						/*
-							for _, tag := range tagsToKeep {
-								if tagN == tag {
-									subsetTags[tagN] = tagV
-								}
-							}
-						*/
-					}
-					if !keep {
-						fmt.Printf("Skipping way[%d]\n", v.ID)
-						continue
-					}
-					t = tags.Tags(subsetTags)
+					// subsetTags := make(map[string]string)
+					// keep := false
+					// for tagN, _ := range v.Tags {
+					// 	if tagN == "highway" {
+					// 		keep = true
+					// 	}
+					// 	/*
+					// 		for _, tag := range tagsToKeep {
+					// 			if tagN == tag {
+					// 				subsetTags[tagN] = tagV
+					// 			}
+					// 		}
+					// 	*/
+					// }
+					// if !keep {
+					// 	fmt.Printf("Skipping way[%d]\n", v.ID)
+					// 	continue
+					// }
+					// t = tags.Tags(subsetTags)
+					t = tags.Tags(v.Tags)
 				}
 				w := &way.Way{
 					Id_:        v.ID,
