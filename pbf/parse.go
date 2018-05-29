@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/brechtbm/osmpbf"
 	"github.com/brechtvm/osm"
+	"github.com/brechtvm/osm/bbox"
 	"github.com/brechtvm/osm/item"
 	"github.com/brechtvm/osm/node"
 	"github.com/brechtvm/osm/point"
@@ -15,6 +16,7 @@ import (
 	"github.com/brechtvm/osm/way"
 	"io"
 	"log"
+	"math"
 	"os"
 	"runtime"
 	"runtime/debug"
@@ -47,21 +49,28 @@ type Pbf struct {
 }
 
 // implements the osm.Parser interface
-func (p *Pbf) Parse() (o *osm.OSM, err error) {
-	tagsToKeep := []string{"maxspeed", "highway"}
+func (p *Pbf) Parse(handler osm.OSMReader) (o *osm.OSM, err error) {
+	//tagsToKeep := []string{"maxspeed", "highway"}
 
 	d := osmpbf.NewDecoder(p.r)
 
 	//err = d.Start(runtime.GOMAXPROCS(-1))
-	err = d.Start(runtime.GOMAXPROCS(4))
+	err = d.Start(runtime.GOMAXPROCS(1))
 	if err != nil {
 		return
 	}
 
-	o = osm.NewOSM()
+	o = osm.NewOSM(handler)
 	o.Users = make(map[uint32]*user.User)
 	o.Timestamps = make(map[string]time.Time)
 	var v interface{}
+
+	lowerlat := math.MaxFloat32
+	lowerlon := math.MaxFloat32
+	upperlat := -math.MaxFloat32
+	upperlon := -math.MaxFloat32
+	counter := 0
+	prevtime := time.Now()
 	for {
 		if v, err = d.Decode(); err == io.EOF {
 			err = nil
@@ -69,84 +78,55 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 		} else if err != nil {
 			return
 		} else {
+
+			counter++
+			if counter%1000000 == 0 {
+				debug.FreeOSMemory()
+				os.Stderr.WriteString(fmt.Sprintf("freeosmem  %5.1f s\n", time.Now().Sub(prevtime).Seconds()))
+				prevtime = time.Now()
+			}
+
 			switch v := v.(type) {
 			case *osmpbf.Node:
-				counter := len(o.Nodes)
-				if counter%1000000 == 0 {
-					log.Printf("Processed %d nodes ", counter)
-					log.Printf("[%d]users", len(o.Users))
-				}
-				// Free up memory every 250mio records
-				if counter%250000000 == 0 {
-					debug.FreeOSMemory()
-					log.Printf("Garbage collected!")
-				}
-				var t tags.Tags
-				// if v.Tags != nil && len(v.Tags) != 0 {
-				// 	subsetTags := make(map[string]string)
-				// 	for tagN, tagV := range v.Tags {
-				// 		for _, tag := range tagsToKeep {
-				// 			if tagN == tag {
-				// 				subsetTags[tagN] = tagV
-				// 			}
-				// 		}
-				// 	}
-				// 	t = tags.Tags(subsetTags)
-				// 	subsetTags = nil
-				// }
-				if v.Tags != nil && len(v.Tags) != 0 {
-					t = v.Tags
-				}
 
+				t := tags.Tags(v.Tags)
 				// UserInfo
-				if _, ok := o.Users[uint32(v.Info.Uid)]; !ok {
-					o.Users[uint32(v.Info.Uid)] = user.New(uint32(v.Info.Uid), v.Info.User)
-				}
 
-				// Timestamps
-				sTimestamp := fmt.Sprintf("%s", v.Info.Timestamp)
-				if _, ok := o.Timestamps[sTimestamp]; !ok {
-					o.Timestamps[sTimestamp] = v.Info.Timestamp
-				}
-
-				o.Nodes[v.ID] = &node.Node{
+				newnode := &node.Node{
 					Id_:        v.ID,
-					User_:      o.Users[uint32(v.Info.Uid)],
+					User_:      user.New(uint32(v.Info.Uid), v.Info.User), //o.Users[uint32(v.Info.Uid)],
 					Position_:  point.New(v.Lat, v.Lon),
-					Timestamp_: o.Timestamps[sTimestamp],
+					Timestamp_: v.Info.Timestamp, //o.Timestamps[sTimestamp],
 					Changeset_: v.Info.Changeset,
 					Version_:   uint16(v.Info.Version),
 					Visible_:   v.Info.Visible,
 					Tags_:      &t,
 				}
+
+				lowerlat = math.Min(lowerlat, newnode.Position_.Lat)
+				upperlat = math.Max(upperlat, newnode.Position_.Lat)
+				lowerlon = math.Min(lowerlon, newnode.Position_.Lon)
+				upperlon = math.Max(upperlon, newnode.Position_.Lon)
+
+				if o.Handler != nil {
+					if o.Handler.ReadNode(newnode) == false {
+						return
+					}
+				} else {
+
+					if _, ok := o.Users[uint32(v.Info.Uid)]; !ok {
+						o.Users[uint32(v.Info.Uid)] = user.New(uint32(v.Info.Uid), v.Info.User)
+					}
+
+					//Timestamps
+					sTimestamp := fmt.Sprintf("%s", v.Info.Timestamp)
+					if _, ok := o.Timestamps[sTimestamp]; !ok {
+						o.Timestamps[sTimestamp] = v.Info.Timestamp
+					}
+					o.Nodes[v.ID] = newnode
+				}
 			case *osmpbf.Way:
-				counter := len(o.Ways)
-				if counter == 0 {
-					log.Println("Processing ways")
-				}
-				var t tags.Tags
-				if v.Tags != nil && len(v.Tags) != 0 {
-					// subsetTags := make(map[string]string)
-					// keep := false
-					// for tagN, _ := range v.Tags {
-					// 	if tagN == "highway" {
-					// 		keep = true
-					// 	}
-					// 	/*
-					// 		for _, tag := range tagsToKeep {
-					// 			if tagN == tag {
-					// 				subsetTags[tagN] = tagV
-					// 			}
-					// 		}
-					// 	*/
-					// }
-					// if !keep {
-					// 	fmt.Printf("Skipping way[%d]\n", v.ID)
-					// 	continue
-					// }
-					// t = tags.Tags(subsetTags)
-					t = tags.Tags(v.Tags)
-				}
+				t := tags.Tags(v.Tags)
 				w := &way.Way{
 					Id_:        v.ID,
 					User_:      user.New(uint32(v.Info.Uid), v.Info.User),
@@ -155,36 +135,30 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 					Version_:   uint16(v.Info.Version),
 					Visible_:   v.Info.Visible,
 					Tags_:      &t,
+					NodeIDs:    v.NodeIDs,
 				}
-				var nd []*node.Node
-				for _, id := range v.NodeIDs {
-					n := o.Nodes[id]
-					if n == nil {
-						err = errors.New(fmt.Sprintf("Missing node #%d in way #%d", id, v.ID))
-						o = nil
+
+				if o.Handler != nil {
+					if o.Handler.ReadWay(w) == false {
 						return
 					}
-					nd = append(nd, n)
-				}
-				w.Nodes_ = nd
-				o.Ways[v.ID] = w
-			case *osmpbf.Relation:
-				counter := len(o.Relations)
-				if counter == 0 {
-					log.Println("Processing relations")
-				}
-				var t tags.Tags
-				if v.Tags != nil && len(v.Tags) != 0 {
-					subsetTags := make(map[string]string)
-					for tagN, tagV := range v.Tags {
-						for _, tag := range tagsToKeep {
-							if tagN == tag {
-								subsetTags[tagN] = tagV
-							}
+				} else {
+					var nd []*node.Node
+					for _, id := range v.NodeIDs {
+						n := o.Nodes[id]
+						if n == nil {
+							err = errors.New(fmt.Sprintf("Missing node #%d in way #%d", id, v.ID))
+							o = nil
+							return
 						}
+						nd = append(nd, n)
 					}
-					t = tags.Tags(subsetTags)
+					w.Nodes_ = nd
+					o.Ways[v.ID] = w
 				}
+			case *osmpbf.Relation:
+				t := tags.Tags(v.Tags)
+
 				r := &relation.Relation{
 					Id_:        v.ID,
 					User_:      user.New(uint32(v.Info.Uid), v.Info.User),
@@ -211,15 +185,32 @@ func (p *Pbf) Parse() (o *osm.OSM, err error) {
 					if member.Ref == nil {
 						err = errors.New(fmt.Sprintf("Missing member #%d (%s) in way #%d", m.ID, member.Type(), v.ID))
 						o = nil
+						panic("mannekes toch, dit mag niet he!")
 						return
 					}
 					members = append(members, member)
 				}
 				r.Members_ = members
-				o.Relations[v.ID] = r
+				if o.Handler != nil {
+					if o.Handler.ReadRelation(r) == false {
+						return
+					}
+				} else {
+					o.Relations[v.ID] = r
+				}
+
 			default:
 				log.Printf("ERROR: unknown type %T\n", v)
 			}
+		}
+	}
+
+	if o.Handler != nil {
+		if o.Handler.ReadBounds(&bbox.BBox{
+			LowerLeft:  point.New(lowerlat, lowerlon),
+			UpperRight: point.New(upperlat, upperlon),
+		}) == false {
+			return
 		}
 	}
 	return

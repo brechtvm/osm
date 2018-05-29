@@ -8,7 +8,7 @@ import (
 )
 
 func (o *OSM) FilterTags(tl ...*tags.Tags) *OSM {
-	no := NewOSM()
+	no := NewOSM(nil)
 	for id := range o.Nodes {
 		n := o.GetNode(id)
 		if n == nil {

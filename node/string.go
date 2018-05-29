@@ -8,9 +8,16 @@ import (
 
 // OSM XML output of a node
 func (n *Node) String() string {
-	s := fmt.Sprintf(`  <node id="%d" timestamp="%s" uid="%d" user="%s" visible="%t" version="%d" changeset="%d" lat="%f" lon="%f"`,
-		n.Id_, n.Timestamp_.Format(time.RFC3339), n.User_.Id, html.EscapeString(n.User_.Name), n.Visible_,
-		n.Version_, n.Changeset_, n.Position_.Lat, n.Position_.Lon)
+	// Do not use %f but use %v!
+	s := fmt.Sprintf(`  <node id="%d" lat="%v" lon="%v" version="%d" timestamp="%s" changeset="%d" uid="%d" user="%s" `,
+		n.Id_,
+		n.Position_.Lat,
+		n.Position_.Lon,
+		n.Version_,
+		n.Timestamp_.Format(time.RFC3339),
+		n.Changeset_,
+		n.User_.Id,
+		html.EscapeString(n.User_.Name))
 	t := n.Tags_.String()
 	if t == "" {
 		return s + " />\n"

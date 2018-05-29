@@ -2,6 +2,7 @@ package tags
 
 import (
 	"fmt"
+	"sort"
 )
 
 func (t *Tags) String() string {
@@ -9,8 +10,18 @@ func (t *Tags) String() string {
 	if t == nil {
 		return s
 	}
-	for k, v := range map[string]string(*t) {
-		s += fmt.Sprintf(`    <tag k="%s" v="%s" />`+"\n", k, encodeXML(v))
+	keys := make([]string, 0)
+	for key, _ := range *t {
+		//if key == "ref" || key == "name" || key == "type" {
+		//	s += fmt.Sprintf(`    <tag k="%s" v="%s" />`+"\n", key, encodeXML((*t)[key]))
+		//} else {
+			keys = append(keys, key)
+		//}
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		s += fmt.Sprintf(`    <tag k="%s" v="%s" />`+"\n", key, encodeXML((*t)[key]))
 	}
 	return s
 }

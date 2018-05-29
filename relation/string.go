@@ -10,8 +10,8 @@ import (
 )
 
 func (r *Relation) String() string {
-	s := fmt.Sprintf(`  <relation id="%d" timestamp="%s" uid="%d" user="%s" visible="%t" version="%d" changeset="%d">`+"\n",
-		r.Id_, r.Timestamp_.Format(time.RFC3339), r.User_.Id, html.EscapeString(r.User_.Name), r.Visible_, r.Version_, r.Changeset_)
+	s := fmt.Sprintf(`  <relation id="%d" version="%d" timestamp="%s" changeset="%d" uid="%d" user="%s">`+"\n",
+		r.Id_, r.Version_, r.Timestamp_.Format(time.RFC3339), r.Changeset_, r.User_.Id, html.EscapeString(r.User_.Name))
 	for _, m := range r.GetMembers() {
 		var id int64
 		if m.Ref == nil {
@@ -21,22 +21,22 @@ func (r *Relation) String() string {
 			switch m.Ref.(type) {
 			case *node.Node:
 				if m.Ref.(*node.Node) == nil {
-					log.Printf("Missing node #%d in relation #%d\n", m.Id(), r.Id())
+					//log.Printf("Missing node #%d in relation #%d\n", m.Id(), r.Id())
 					id = m.Id()
 				} else {
 					id = m.Ref.(*node.Node).Id_
 				}
 			case *way.Way:
 				if m.Ref.(*way.Way) == nil {
-					log.Printf("Missing way #%d in relation #%d\n", m.Id(), r.Id())
+					//log.Printf("Missing way #%d in relation #%d\n", m.Id(), r.Id())
 					id = m.Id()
 				} else {
 					id = m.Ref.(*way.Way).Id_
 				}
 			case *Relation:
 				if m.Ref.(*Relation) == nil {
-					log.Printf("Missing relation #%d in relation #%d\n", m.Id(), r.Id())
-					id = 0
+					//log.Printf("Missing relation #%d in relation #%d\n", m.Id(), r.Id())
+					id = m.Id()
 				} else {
 					id = m.Ref.(*Relation).Id_
 				}

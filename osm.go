@@ -14,22 +14,30 @@ import (
 
 // the osm.Parser interface, currently implemented by the xml and pbf sub modules
 type Parser interface {
-	Parse() (*OSM, error)
+	Parse(OSMReader) (*OSM, error)
 }
 
 // returns a new OSM, which is filled by the passed osm.Parser
-func New(p Parser) (*OSM, error) {
-	return p.Parse()
+func New(p Parser, reader OSMReader) (*OSM, error) {
+	return p.Parse(reader)
 }
 
 // returns a new and empty OSM
-func NewOSM() *OSM {
+func NewOSM(handler OSMReader) *OSM {
 	return &OSM{
 		Version:   "0.6",
 		Nodes:     make(map[int64]*node.Node),
 		Ways:      make(map[int64]*way.Way),
 		Relations: make(map[int64]*relation.Relation),
+		Handler:   handler,
 	}
+}
+
+type OSMReader interface {
+	ReadBounds(n *bbox.BBox) bool
+	ReadNode(*node.Node) bool
+	ReadWay(*way.Way) bool
+	ReadRelation(*relation.Relation) bool
 }
 
 // the main entry point for OSM data
@@ -42,6 +50,7 @@ type OSM struct {
 	Relations  map[int64]*relation.Relation
 	Users      map[uint32]*user.User
 	Timestamps map[string]time.Time
+	Handler    OSMReader
 }
 
 func (o *OSM) BoundingBox() (*bbox.BBox, error) {
@@ -133,11 +142,14 @@ func (o *OSM) String_old() string {
 	return xml
 }
 
+func OsmXmlHeader() string {
+	return "<?xml version='1.0' encoding='UTF-8'?>\n" +
+		fmt.Sprintf(`<osm version="0.6" upload="true" generator="Be-Mobile (Brecht) - osm.String v%s">`+"\n", osmStringVersion)
+}
+
 func (o *OSM) String() string {
 	var xmlBuffer bytes.Buffer
-	xml := "<?xml version='1.0' encoding='UTF-8'?>\n" +
-		fmt.Sprintf(`<osm version="0.6" upload="true" generator="Be-Mobile (Brecht) - osm.String v%s">`+"\n", osmStringVersion)
-	xmlBuffer.WriteString(xml)
+	xmlBuffer.WriteString(OsmXmlHeader())
 
 	bb, err := o.BoundingBox()
 	if err == nil {

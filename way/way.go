@@ -39,6 +39,7 @@ func (self *Way) Visible() bool { return self.Visible_ }
 
 type Way struct {
 	Id_        int64
+	NodeIDs    []int64
 	Nodes_     []*node.Node
 	User_      *user.User
 	Tags_      *tags.Tags
@@ -67,6 +68,7 @@ func New(nl []*node.Node) (w *Way, err error) {
 		return nil, errors.New("Too few nodes for way")
 	}
 	return &Way{
+		NodeIDs:    make([]int64, 0),
 		Nodes_:     nl,
 		Id_:        newWayId(),
 		Tags_:      tags.New(),
